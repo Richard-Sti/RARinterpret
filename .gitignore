@@ -18,3 +18,5 @@ results_paper/*
 scripts/backup/*
 data/*
 ndtest/*
+RARinterpret/old
+scripts_plots/*.sh
