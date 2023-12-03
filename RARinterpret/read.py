@@ -488,7 +488,7 @@ class RARFrame:
         self._data = add_columns(self._data, data_append, data_efe.dtype.names)
         return self._data
 
-    def read_from_harry(self, dpath=None, lpath=None):
+    def read_urar(self, dpath=None, lpath=None):
         """
         Read RAR-transformed data from Harry's files.
 
