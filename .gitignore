@@ -15,6 +15,7 @@ scripts/run_*.sh
 scripts/__pycache__/*
 results/*
 results_paper/*
+data/*.npy
 scripts/backup/*
 ndtest/*
 RARinterpret/old
