@@ -9,7 +9,7 @@ INSTALL_REQ += ["scikit-learn",
                 "optuna",
                 "matplotlib",
                 "jax[cpu]",
-                "astropy"
+                "astropy",
                 "tqdm",
                 "tensorflow",
                 "tensorflow_addons",
