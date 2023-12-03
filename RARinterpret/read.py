@@ -15,6 +15,7 @@
 Data processing functions and a file system.
 """
 from os.path import join
+from warnings import filterwarnings, catch_warnings
 
 import numpy
 from astropy import units
@@ -179,7 +180,14 @@ class RARFrame:
         # Preallocate an array
         dtype = {"names": cols,
                  "formats": [numpy.int64] + [numpy.float64] * (len(cols) - 1)}
-        out = numpy.full(data.shape[0], numpy.nan, dtype=dtype)
+
+        # Catch a warning that occus when converting NaN to int
+        with catch_warnings():
+            filterwarnings(
+                "ignore", message=".*invalid value encountered in cast.*",
+                category=RuntimeWarning
+                )
+            out = numpy.full(data.shape[0], numpy.nan, dtype=dtype)
         # Fill the array
         for i, col in enumerate(cols):
             out[col] = data[:, i]
@@ -216,7 +224,13 @@ class RARFrame:
         # Preallocate an array
         dtype = {"names": cols,
                  "formats": [numpy.int64] + [numpy.float64] * (len(cols) - 1)}
-        out = numpy.full(data.shape[0], numpy.nan, dtype=dtype)
+        # Catch a warning that occus when converting NaN to int
+        with catch_warnings():
+            filterwarnings(
+                "ignore", message=".*invalid value encountered in cast.*",
+                category=RuntimeWarning
+                )
+            out = numpy.full(data.shape[0], numpy.nan, dtype=dtype)
         # Fill the array
         for i, col in enumerate(cols):
             out[col] = data[:, i]
@@ -357,7 +371,13 @@ class RARFrame:
         descr_gal.pop(data_gal.dtype.names.index("index"))
 
         # Preallocate an array
-        out = numpy.full(data_rc.size, numpy.nan, dtype=descr_rc + descr_gal)
+        with catch_warnings():
+            filterwarnings(
+                "ignore", message=".*invalid value encountered in cast.*",
+                category=RuntimeWarning
+                )
+            out = numpy.full(data_rc.size, numpy.nan,
+                             dtype=descr_rc + descr_gal)
         # Fill the array with RC data
         for par in data_rc.dtype.names:
             out[par] = data_rc[par]
@@ -864,7 +884,12 @@ def add_columns(arr, X, cols):
         dtype.append((col, X[i, :].dtype.descr[0][1]))
 
     # Fill in the old array
-    out = numpy.full(arr.size, numpy.nan, dtype=dtype)
+    with catch_warnings():
+        filterwarnings(
+            "ignore", message=".*invalid value encountered in cast.*",
+            category=RuntimeWarning
+            )
+        out = numpy.full(arr.size, numpy.nan, dtype=dtype)
     for col in arr.dtype.names:
         out[col] = arr[col]
     for i, col in enumerate(cols):
