@@ -20,7 +20,7 @@ from .analytical import (RARIF, SimpleIFEFE, BestRARESR, MockRAR, LinearRelation
                          ToyExponentialModel, ToyKuzminModel)  # noqa
 from .analysis import (make_test_masks, train_test_from_mask, split_jobs,  # noqa
                        basic_pipeline, get_importance, est_fit_score)  # noqa
-from .nn import PLModel  # noqa
+# from .nn import PLModel  # noqa
 
 
 def pretty_label(label, pretty_dict):
