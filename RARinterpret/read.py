@@ -571,6 +571,90 @@ class RARFrame:
 
         return out
 
+    def read_urar_single(self, galaxy_name, take_every=1,
+                         dpath=None, lpath=None):
+        """
+        Generate the RAR-transformed data for a single galaxy.
+
+        Parameters
+        ----------
+        galaxy_name : str
+            Name of the galaxy.
+        take_every : int, optional
+            Take every `take_every` sample from the chain.
+        dpath : str
+            Path to the data file.
+        lpath : str
+            Path to the labels file.
+
+        Returns
+        -------
+        data : dict
+            Dictionary with keys `gbar`, `gobs` and `r`.
+        """
+        if galaxy_name not in self._name2gindx:
+            raise KeyError(f"Galaxy `{galaxy_name}` not found in the frame.")
+        if not isinstance(take_every, int) or take_every < 1:
+            raise ValueError("`take_every` must be a positive integer.")
+
+        gindex = self._name2gindx[galaxy_name]
+        k0 = numpy.where(self["index"] == gindex)[0][0]
+        m = self["index"] == gindex     # Mask of this RC
+
+        folder = "/mnt/zfsusers/hdesmond/Big_Inference/"
+        if dpath is None:
+            dpath = join(folder, "samples_52_scatter_EFE2.npy")
+        if lpath is None:
+            lpath = join(folder, "labels_52_scatter_EFE2.npy")
+
+        # ML bulge are stored as 0, ..., 30 but that does not correspond
+        # to galaxy indices, only in their ordering. Correct like this.
+        arr2bulind = [i for i in range(self["index"].max())
+                      if numpy.any(self["Vbul"][self["index"] == i] > 0)]
+        arr2bulind = {i: j for j, i in enumerate(arr2bulind)}
+
+        # Load the data and labels for the entire SPARC data set.
+        # `data` is a 2-dimensional array of shape (nchain_samples, nlabels)
+        data = numpy.load(dpath)
+        labels = numpy.load(lpath)
+
+        # Create the mapping from labels to columns numbers.
+        lab2col = {label: i for i, label in enumerate(labels)}
+        # Take every `take_every` sample from the chain.
+        data = data[::take_every, :]
+
+        # Get the samples of M/L, L36, distance and inclination of the galaxy
+        try:
+            mlbul = data[:, lab2col[f"ML_bul_{arr2bulind[gindex]}"]]
+            mlbul = mlbul.reshape(-1, 1)
+        except KeyError:
+            mlbul = 0.
+        mldisk = data[:, lab2col[f"ML_disk_{gindex}"]].reshape(-1, 1)
+        mlgas = data[:, lab2col[f"ML_gas_{gindex}"]].reshape(-1, 1)
+        L36 = data[:, lab2col[f"L36_{gindex}"]].reshape(-1, 1) * 1e-9
+        inc = numpy.deg2rad(data[:, lab2col[f"Inc_{gindex}"]].reshape(-1, 1))
+        dist = data[:, lab2col[f"Dist_{gindex}"]].reshape(-1, 1)
+
+        # Calculate gbar = Vbar^2 / r from components. It is independent of
+        # of the distance and only depends on the M/L and L36
+        gbar = (
+            L36 / self["L36"][k0] * mldisk * self["Vdisk"][m] * numpy.abs(self["Vdisk"][m]) # noqa
+            + L36 / self["L36"][k0] * mlbul * self["Vbul"][m] * numpy.abs(self["Vbul"][m])  # noqa
+            + mlgas * self["Vgas"][m] * numpy.abs(self["Vgas"][m]))
+        gbar /= self["r"][m]
+        gbar *= 1e13 / KPC2KM
+
+        # Now rescale gobs
+        gobs = self["gobs"][m] * (self["dist"][k0] / dist)
+        inc0 = numpy.deg2rad(self["inc"][k0])
+
+        gobs *= numpy.sin(inc0) / numpy.sin(inc)**2
+
+        # Lastly also scale the radius
+        rad = self["r"][m] * dist / self["dist"][k0]
+
+        return {"gbar": gbar, "gobs": gobs, "r": rad}
+
     def generate_log_variance(self, feat):
         r"""
         Return approximate Gaussian-propagated variance of a logarithm of a
