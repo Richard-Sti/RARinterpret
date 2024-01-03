@@ -12,15 +12,14 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-from .read import (RARFrame, replace_values, add_columns, rm_columns,  # noqa
+from .read import (RARFrame, replace_values, add_columns, rm_columns,               # noqa
                    extract_col_from_X)  # noqa
-from .analytical import (RARIF, SimpleIFEFE, BestRARESR, MockRAR, LinearRelation,  # noqa
-                         QuadraticRelation, RVRQuadratic, LVQuadratic, SJCubic, MockSBJobs,  # noqa
-                         ToyExponentialModel, ToyKuzminModel)  # noqa
-from .analysis import (make_test_masks, train_test_from_mask, split_jobs,  # noqa
-                       basic_pipeline, get_importance, est_fit_score)  # noqa
-# from .nn import PLModel  # noqa
+from .analytical import (RARIF, SimpleIFEFE, BestRARESR, MockRAR, LinearRelation,   # noqa
+                         QuadraticRelation, RVRQuadratic, LVQuadratic, SJCubic,     # noqa
+                         MockSBJobs,  ToyExponentialModel, ToyKuzminModel)          # noqa
+from .analysis import (make_test_masks, train_test_from_mask, split_jobs,           # noqa
+                       basic_pipeline, get_importance, est_fit_score)               # noqa
+from .hooks import AccelerationRotationCurveModel, is_increasing                    # noqa
 
 
 def pretty_label(label, pretty_dict):
