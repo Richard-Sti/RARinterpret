@@ -381,8 +381,8 @@ class AccelerationRotationCurveModel:
             scatter = numpyro.sample("scatter", dist.TruncatedNormal(0.0335, 0.001, low=0))  # noqa
         a0 = numpyro.sample("a0", dist.Normal(1.215, 0.1))
 
-        ML_disk = numpyro.sample("ML_disk", dist.LogNormal(*lognormal_mean_std_to_loc_shape(0.5, 2 * 0.125)))   # noqa
-        ML_bul = numpyro.sample("ML_bul", dist.LogNormal(*lognormal_mean_std_to_loc_shape(0.7, 2 * 0.175)))     # noqa
+        ML_disk = numpyro.sample("ML_disk", dist.LogNormal(*lognormal_mean_std_to_loc_shape(0.5, 0.125)))   # noqa
+        ML_bul = numpyro.sample("ML_bul", dist.LogNormal(*lognormal_mean_std_to_loc_shape(0.7, 0.175)))     # noqa
         ML_gas = numpyro.sample("ML_gas", dist.LogNormal(*lognormal_mean_std_to_loc_shape(1., 0.1)))        # noqa
         d = numpyro.sample(
             "dist", dist.TruncatedNormal(self["dist"], self["e_dist"], low=0))  # noqa
