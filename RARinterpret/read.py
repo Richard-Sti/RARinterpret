@@ -653,11 +653,16 @@ class RARFrame:
 
         gobs *= (numpy.sin(inc0) / numpy.sin(inc))**2
 
+        # Up to gobs proportionality which cancels.
+        e_gobs_stat = 2 * self["e_Vobs"][m] / self["Vobs"][m]
+        log_gobs = (numpy.log(gobs) - 0.5 * numpy.log(1 + e_gobs_stat**2)) / numpy.log(10.)     # noqa
+
         # Lastly also scale the radius
         rad = self["r"][m] * dist / self["dist"][k0]
 
         return {"gbar": gbar,
                 "gobs": gobs,
+                "log_gobs": log_gobs,
                 "r": rad,
                 "ML_disk": mldisk,
                 "ML_bul": mlbul,
