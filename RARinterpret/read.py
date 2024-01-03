@@ -635,6 +635,9 @@ class RARFrame:
         inc = numpy.deg2rad(data[:, lab2col[f"Inc_{gindex}"]].reshape(-1, 1))
         dist = data[:, lab2col[f"Dist_{gindex}"]].reshape(-1, 1)
 
+        a0 = data[:, lab2col["a0"]].reshape(-1, 1)
+        scatter = data[:, lab2col["scatter"]].reshape(-1, 1)
+
         # Calculate gbar = Vbar^2 / r from components. It is independent of
         # of the distance and only depends on the M/L and L36
         gbar = (
@@ -648,12 +651,23 @@ class RARFrame:
         gobs = self["gobs"][m] * (self["dist"][k0] / dist)
         inc0 = numpy.deg2rad(self["inc"][k0])
 
-        gobs *= numpy.sin(inc0) / numpy.sin(inc)**2
+        gobs *= (numpy.sin(inc0) / numpy.sin(inc))**2
 
         # Lastly also scale the radius
         rad = self["r"][m] * dist / self["dist"][k0]
 
-        return {"gbar": gbar, "gobs": gobs, "r": rad}
+        return {"gbar": gbar,
+                "gobs": gobs,
+                "r": rad,
+                "ML_disk": mldisk,
+                "ML_bul": mlbul,
+                "ML_gas": mlgas,
+                "L36": L36,
+                "inc": inc,
+                "dist": dist,
+                "a0": a0,
+                "scatter": scatter,
+                }
 
     def generate_log_variance(self, feat):
         r"""
