@@ -349,6 +349,7 @@ class AccelerationRotationCurveModel:
                 samples["ML_bul"][i],
                 samples["L36"][i],
             ))
+
             log_gobs[i] = self.scale_log_gobs(
                 samples["inc"][i],
                 samples["dist"][i],
