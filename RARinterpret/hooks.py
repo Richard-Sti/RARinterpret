@@ -87,7 +87,16 @@ def x2_larger_than_x1(mu1, std1, mu2, std2):
     def integrand(x):
         return jnp.exp(-0.5 * x**2)  * erfc((x * std1 + mu1 - mu2) / (jnp.sqrt(2) * std2))  # noqa
 
-    return simps(integrand, -15, 15, 512) / (2 * jnp.pi) * (jnp.pi / 2)**0.5
+    return simps(integrand, -15, 15, 256) / (2 * jnp.pi) * (jnp.pi / 2)**0.5
+
+
+def _is_increasing(y, yerr):
+    lprob = 0.0
+    for i in range(1, len(y)):
+        for j in range(i):
+            lprob += jnp.log10(x2_larger_than_x1(y[j], yerr[j], y[i], yerr[i]))
+
+    return lprob
 
 
 def is_increasing(y, yerr, return_log=True, normalize=False):
@@ -113,10 +122,7 @@ def is_increasing(y, yerr, return_log=True, normalize=False):
     -------
     float
     """
-    lprob = 0.0
-    for i in range(1, len(y)):
-        for j in range(i):
-            lprob += jnp.log10(x2_larger_than_x1(y[j], yerr[j], y[i], yerr[i]))
+    lprob = _is_increasing(y, yerr)
 
     if normalize:
         lprob /= len(y)
@@ -358,7 +364,7 @@ class AccelerationRotationCurveModel:
                 raise TypeError("Scatter must be a float or int.")
             scatter = [scatter]
 
-        f = jit(is_increasing)
+        f = jit(_is_increasing)
 
         nsamples = len(log_gobs)
         out = np.zeros(nsamples)
@@ -408,8 +414,8 @@ class AccelerationRotationCurveModel:
 
         if self.monotonicity:
             ks = jnp.argsort(gbar)
-            alpha = is_increasing(log_gobs[ks], yerr[ks])
-            numpyro.factor("obs", jnp.sum(log_likelihood) + 5 * alpha)
+            alpha = _is_increasing(log_gobs[ks], yerr[ks])
+            numpyro.factor("obs", jnp.sum(log_likelihood) + alpha)
         else:
             numpyro.factor("obs", jnp.sum(log_likelihood))
 
