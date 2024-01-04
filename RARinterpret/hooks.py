@@ -369,9 +369,8 @@ class AccelerationRotationCurveModel:
         nsamples = len(log_gobs)
         out = np.zeros(nsamples)
         for n in trange(nsamples, desc="Monotonicity"):
-            ks = np.argsort(log_gbar[n])
             yerr = np.sqrt(scatter[n]**2 + self["e_log_gobs2"])
-            out[n] = f(log_gobs[n][ks], yerr[ks])
+            out[n] = f(log_gobs[n], yerr)
 
         if log_gobs.size == 1:
             out = out[0]
@@ -413,8 +412,8 @@ class AccelerationRotationCurveModel:
         log_likelihood = dist.Normal(log_mu, yerr).log_prob(log_gobs)
 
         if self.monotonicity:
-            ks = jnp.argsort(gbar)
-            alpha = _is_increasing(log_gobs[ks], yerr[ks])
+            # NOTE: Should these be sorted? Currently sorted by radius.
+            alpha = _is_increasing(log_gobs, yerr)
             numpyro.factor("obs", jnp.sum(log_likelihood) + alpha)
         else:
             numpyro.factor("obs", jnp.sum(log_likelihood))
