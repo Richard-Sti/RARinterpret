@@ -383,18 +383,15 @@ class AccelerationRotationCurveModel:
         """
         # Sample hyperparameters
         if self.intrinsic_scatter:
-            scatter = numpyro.sample("scatter", dist.TruncatedNormal(0.0335, 0.001, low=0))  # noqa
+            scatter = numpyro.sample("scatter", dist.TruncatedNormal(0.0335, 0.001, low=0))                     # noqa
         a0 = numpyro.sample("a0", dist.Normal(1.215, 0.1))
 
-        ML_disk = numpyro.sample("ML_disk", dist.LogNormal(*lognormal_mean_std_to_loc_shape(0.5, 0.125)))   # noqa
-        ML_bul = numpyro.sample("ML_bul", dist.LogNormal(*lognormal_mean_std_to_loc_shape(0.7, 0.175)))     # noqa
-        ML_gas = numpyro.sample("ML_gas", dist.LogNormal(*lognormal_mean_std_to_loc_shape(1., 0.1)))        # noqa
-        d = numpyro.sample(
-            "dist", dist.TruncatedNormal(self["dist"], self["e_dist"], low=0))  # noqa
-        inc = numpyro.sample(
-            "inc", dist.TruncatedNormal(self["inc"], self["e_inc"], low=0, high=np.pi / 2))  # noqa
-        L36 = numpyro.sample(
-            "L36", dist.TruncatedNormal(self["L36"], self["e_L36"], low=0))
+        ML_disk = numpyro.sample("ML_disk", dist.LogNormal(*lognormal_mean_std_to_loc_shape(0.5, 0.125)))       # noqa
+        ML_bul = numpyro.sample("ML_bul", dist.LogNormal(*lognormal_mean_std_to_loc_shape(0.7, 0.175)))         # noqa
+        ML_gas = numpyro.sample("ML_gas", dist.LogNormal(*lognormal_mean_std_to_loc_shape(1., 0.1)))            # noqa
+        d = numpyro.sample("dist", dist.TruncatedNormal(self["dist"], self["e_dist"], low=0))                   # noqa
+        inc = numpyro.sample("inc", dist.TruncatedNormal(self["inc"], self["e_inc"], low=0, high=np.pi / 2))    # noqa
+        L36 = numpyro.sample("L36", dist.TruncatedNormal(self["L36"], self["e_L36"], low=0))                    # noqa
 
         # Scale gbar and log(gobs)
         gbar = self.scale_gbar(ML_gas, ML_disk, ML_bul, L36)
