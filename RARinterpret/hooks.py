@@ -391,7 +391,7 @@ class AccelerationRotationCurveModel:
         ML_bul = numpyro.sample("ML_bul", dist.LogNormal(*lognormal_mean_std_to_loc_shape(0.7, 0.175)))         # noqa
         ML_gas = numpyro.sample("ML_gas", dist.LogNormal(*lognormal_mean_std_to_loc_shape(1., 0.1)))            # noqa
         d = numpyro.sample("dist", dist.TruncatedNormal(self["dist"], self["e_dist"], low=0))                   # noqa
-        inc = numpyro.sample("inc", dist.TruncatedNormal(self["inc"], self["e_inc"], low=0, high=np.pi / 2))    # noqa
+        inc = numpyro.sample("inc", dist.TruncatedNormal(self["inc"], self["e_inc"], low=0, high=np.pi))        # noqa
         L36 = numpyro.sample("L36", dist.TruncatedNormal(self["L36"], self["e_L36"], low=0))                    # noqa
 
         # Scale gbar and log(gobs)
